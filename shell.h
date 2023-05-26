@@ -1,55 +1,59 @@
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef _SHELL_H_
+#define _SHELL_H_
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 #include <errno.h>
-#include <signal.h>
+#include <limits.h>
+#include <sys/stat.h>
+
+
+void execute_command(const char *command);
+void execute_parent(pid_t child_pid, const char *command);
+void execute_child(const char *command);
 
 /**
- * struct my_builtin_s - struct define
- * @name: character
- * @f: integer
+ * passinfo - Structure for storing command information
+ * @ac: Argument count
+ * @av: Argument vector (array of strings)
+ * @linecnt_flag: Line count flag
+ * @fname: File name
+ * @path: Path information
+ * @arg_cnt: Count of arguments
+ * @line_cnt: Line count
+ * @err_num: Error number
+ * @env_vars: Environment variables array
+ * @env_changed: Environment change flag
+ * @status: Status code
+ * @cmd_buf_ptr: Pointer to command chain buffer, for memory management
+ * @cmd_buf_type: Command type: ||, &&, ;
+ * @read_fd: Read file descriptor
+ * @hist_cnt: History count
  */
-
-typedef struct my_builtin_s
+typedef struct passinfo
 {
-	char *name;
-	int (*f)(char **av);
-} builtin_t;
-
-extern char **environ;
-
-char *_strpbrk(char *s, char *accept);
-int _strcmp(char *s1, char *s2);
-int _atoi(char *s);
-int _strlen(const char *s);
-char *_strcpy(char *dest, char *src);
-char *_strcat(char *dest, char *src);
-char *_memcpy(char *dest, const char *src, unsigned int n);
-char *_strdup(const char *s);
-
-void handle_interrupt(int signum);
-void prompt(void);
-char *read_cmd(void);
-ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-char  **_tokenize(char *command, char *delim);
-char *find_command(char *command);
-char *build_path(char *dir, char *command);
-void shell_loop(char **av, char **env);
-void exe_cmd1(char *command, char **av, char **env);
-void executor(char *command, char **av, char **env);
-void execute_command(char *command, char **av, char **env);
-void cleanup(char *command, char **av);
-void execute_exit(void);
-void print_env(char **env);
-void cleaner(char **temp);
-void handle_exit(char *command, char **av);
-void process_command(char *command, char **av, char **env);
+    char *ac;
+    char **av;
+    char *path;
+    int arg_cnt;
+    int err_num;
+    int linecnt_flag;
+    unsigned int line_cnt;
+    char *fname;
+    int status;
+    char **env_vars;
+    int hist_cnt;
+    int env_changed;
+    char **cmd_buf_ptr;
+    int read_fd;
+    
+} passinfo_t;
 
 #endif
+
+
